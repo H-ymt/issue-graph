@@ -26,6 +26,10 @@
     "./transport/linear": {
       "types": "./dist/transports/linear.d.ts",
       "import": "./dist/transports/linear.js"
+    },
+    "./transport/backlog": {
+      "types": "./dist/transports/backlog.d.ts",
+      "import": "./dist/transports/backlog.js"
     }
   },
   "main": "./dist/index.js",

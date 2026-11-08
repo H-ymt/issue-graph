@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { createInterface } from "node:readline/promises";
+import { backlogSetupGuide, runBacklog } from "./backlog-cli.js";
+import { backlogDashboardModel } from "./backlog-html.js";
 import { classify, fillMentionedBy } from "./classify.js";
 import {
   clusterJsonPrompt,
@@ -73,6 +75,7 @@ Run with no arguments inside a GitHub repository to open its backlog dashboard.
 
 commands
   linear <issue>          read Linear issue relationships or capture --project UUID
+  backlog <issue>         read Backlog relationships or capture --project KEY
   open [repo]              open issues and PRs → optional root-cause clusters → dashboard
   graph <item...>          reference graph of issues/PRs: linked work, competing fixes, overlap
   rank [repo]              what to fix first, by discussion heat
@@ -481,6 +484,41 @@ export async function runCli(argv = process.argv.slice(2)): Promise<void> {
           const model = linearDashboardModel(report, options.clusters);
           const out =
             options.path || privateExportPath(`issue-graph-linear-${report.workspace.id}.html`);
+          writeNextDashboard(out, [model], modelDefaults([model]));
+          process.stderr.write(`wrote ${out}\n`);
+          if (options.save)
+            process.stderr.write(`dashboard run saved: ${writeDashboardModel(model.id, model)}\n`);
+          if (options.open) openInBrowser(out);
+        },
+      },
+    );
+    return;
+  }
+  if (argv[0] === "backlog") {
+    process.exitCode = await runBacklog(
+      argv.slice(1),
+      async () => {
+        const { parseBacklogHost } = await import("./backlog-queries.js");
+        const target = parseBacklogHost(process.env.BACKLOG_SPACE ?? "");
+        const apiKey = process.env.BACKLOG_API_KEY;
+        const accessToken = process.env.BACKLOG_ACCESS_TOKEN;
+        if (!target || (!apiKey && !accessToken)) throw new Error(backlogSetupGuide());
+        const { backlogReader } = await import("./transports/backlog.js");
+        return backlogReader({
+          space: target.space,
+          domain: target.domain,
+          apiKey: apiKey || undefined,
+          accessToken: accessToken || undefined,
+        });
+      },
+      {
+        stdout: (value) => process.stdout.write(value),
+        stderr: (value) => process.stderr.write(value),
+        readClusters: async (path) => JSON.parse(readFileSync(path, "utf8")),
+        dashboard: async (report, options) => {
+          const model = backlogDashboardModel(report, options.clusters);
+          const out =
+            options.path || privateExportPath(`issue-graph-backlog-${report.space.spaceKey}.html`);
           writeNextDashboard(out, [model], modelDefaults([model]));
           process.stderr.write(`wrote ${out}\n`);
           if (options.save)
@@ -1060,6 +1098,19 @@ function runAuth(a: Args): void {
             ? "linear login"
             : linear.variable,
       fix: linear.kind === "none" ? "issue-graph linear login" : "",
+    },
+    {
+      provider: "backlog",
+      signedIn: Boolean(process.env.BACKLOG_API_KEY || process.env.BACKLOG_ACCESS_TOKEN),
+      via: process.env.BACKLOG_API_KEY
+        ? "BACKLOG_API_KEY"
+        : process.env.BACKLOG_ACCESS_TOKEN
+          ? "BACKLOG_ACCESS_TOKEN"
+          : "BACKLOG_API_KEY",
+      fix:
+        process.env.BACKLOG_API_KEY || process.env.BACKLOG_ACCESS_TOKEN
+          ? ""
+          : "set BACKLOG_SPACE and BACKLOG_API_KEY",
     },
   ];
   if (a.format === "json") console.log(JSON.stringify(rows, null, 2));

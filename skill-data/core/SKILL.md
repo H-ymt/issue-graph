@@ -31,6 +31,7 @@ If a command or asset is missing, report the CLI/skill mismatch and observed err
 | Inspect effective scoring defaults | `issue-graph config show --provider github --scope owner/repo --json` |
 | Backlog verification queue | `issue-graph reconcile owner/repo` |
 | Linear issue or project relationships | `issue-graph linear <issue>`, or `issue-graph linear --project UUID` |
+| Nulab Backlog issue or project relationships | `issue-graph backlog <issue>`, or `issue-graph backlog --project KEY` |
 | Next backlog action | `issue-graph plan owner/repo` |
 | Find work one fix resolves together | `issue-graph plan owner/repo --budget 1000 --format json`, then read `sweep` |
 
@@ -39,6 +40,8 @@ For counts, skip graph discovery. Resolve repositories and authors from the requ
 Live collection supports GitHub. `open`, `rank`, and `cluster` accept a repository or items. `graph` needs items or `--label`. Items can be numbers, `owner/repo#123`, or URLs; bare numbers use `--repo` or the checkout's GitHub remote. Inspect an issue's graph before starting work and credit existing contributors.
 
 Use the dedicated `linear` command for Linear. If `issue-graph linear status` reports no connection, ask the user to run `issue-graph linear login` (browser, read-only) or to set `LINEAR_API_KEY`; never ask for keys in chat. Add `--github` to read the state of attached GitHub issues and pull requests, which shows whether a blocker's linked work is open, draft, or merged. Read `issue-graph linear --help` for its flags and limits.
+
+Use the dedicated `backlog` command for Nulab Backlog. It reads `BACKLOG_SPACE` with either `BACKLOG_API_KEY` or `BACKLOG_ACCESS_TOKEN` from the environment; never ask for keys in chat. Backlog has no browser sign-in and no closed flag on statuses: the project's last status in display order is treated as resolved, and `--all` includes it. Read `issue-graph backlog --help` for its flags and limits.
 
 ## Query saved data
 

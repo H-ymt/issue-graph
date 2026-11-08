@@ -219,6 +219,7 @@ const core = await import(name);
 const { httpTransport } = await import(name + "/transport/http");
 const { shellTransport } = await import(name + "/transport/shell");
 const { linearReader } = await import(name + "/transport/linear");
+const { backlogReader } = await import(name + "/transport/backlog");
 assert.ok(import.meta.resolve(name).endsWith("/dist/index.js"));
 assert.equal(typeof core.crawl, "function");
 assert.equal(typeof core.parseNodeResponse, "function");
@@ -226,6 +227,7 @@ assert.equal(typeof core.collectStatus, "function");
 assert.equal(typeof httpTransport, "function");
 assert.equal(typeof shellTransport, "function");
 assert.equal(typeof linearReader, "function");
+assert.equal(typeof backlogReader, "function");
 assert.equal(typeof core.buildLinearGraph, "function");
 assert.equal(typeof core.buildLinearProject, "function");
 assert.equal(typeof core.linearDashboardModel, "function");
@@ -458,11 +460,13 @@ try {
   assert.equal(manifest.exports["./transport/http"].import, "./dist/transports/http.js");
   assert.equal(manifest.exports["./transport/shell"].import, "./dist/transports/shell.js");
   assert.equal(manifest.exports["./transport/linear"].import, "./dist/transports/linear.js");
+  assert.equal(manifest.exports["./transport/backlog"].import, "./dist/transports/backlog.js");
   assert.equal(manifest.types, "./dist/index.d.ts");
   assert.equal(manifest.exports["."].types, "./dist/index.d.ts");
   assert.equal(manifest.exports["./transport/http"].types, "./dist/transports/http.d.ts");
   assert.equal(manifest.exports["./transport/shell"].types, "./dist/transports/shell.d.ts");
   assert.equal(manifest.exports["./transport/linear"].types, "./dist/transports/linear.d.ts");
+  assert.equal(manifest.exports["./transport/backlog"].types, "./dist/transports/backlog.d.ts");
   assert.equal(
     readFileSync(join(installed, "dist/bin.js"), "utf8").split("\n")[0],
     "#!/usr/bin/env node",

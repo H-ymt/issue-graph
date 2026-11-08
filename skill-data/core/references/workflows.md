@@ -298,3 +298,23 @@ Read coverage before making completeness claims: node/page limits and read failu
 can make the graph partial. Text mentions and non-GitHub attachment targets are not
 crawled, and GitHub targets are never expanded past one hop.
 The HTML is a static capture; regenerate it to refresh.
+
+
+## Nulab Backlog captures
+
+Use `issue-graph backlog --help` before a Backlog workflow. It reads `BACKLOG_SPACE`
+(a space key, or a host such as `example.backlog.jp` for legacy spaces) plus one of
+`BACKLOG_API_KEY` or `BACKLOG_ACCESS_TOKEN` from the environment. Never ask for keys
+in chat, and note that requests only read.
+
+- `issue-graph backlog PROJ-123 --space example --json` reads a bounded neighborhood.
+- `issue-graph backlog --project PROJ --html project.html` reads open issues and saves
+  that project for `issue-graph dashboard`. Add `--all` to include the project's
+  closed status.
+- Issue keys in descriptions and comments become edges only when their prefix is a
+  project key in the same space, so tokens such as `UTF-8` are ignored.
+- Backlog attachments have no public URL, so only links written in text are reported.
+
+Backlog has no closed flag on statuses: the project's last status in display order is
+treated as resolved. If statuses cannot be read, the project listing may include
+closed issues, and open counts are omitted instead of guessed.

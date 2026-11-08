@@ -1,0 +1,59 @@
+---
+title: Nulab Backlog
+description: Read Backlog parent/child relations, related issues, and issue keys mentioned in text with space-scoped identity.
+---
+
+Start from one Backlog issue to see its parent and sub-issues, related issues, and cross-references written in descriptions and comments.
+
+## Connect Backlog
+
+Backlog has no browser sign-in flow, so the command reads two environment variables:
+
+```bash
+export BACKLOG_SPACE=your-space        # or globetails.backlog.jp for legacy spaces
+export BACKLOG_API_KEY=...             # personal API key with read access
+```
+
+`BACKLOG_API_KEY` is sent as the `apiKey` query parameter on every request. Set `BACKLOG_ACCESS_TOKEN` instead to use an OAuth 2.0 access token in the `Authorization: Bearer` header. Set exactly one of them. `issue-graph auth status` shows what's connected.
+
+```bash
+issue-graph backlog PROJ-123 --depth 1 --max-nodes 20
+issue-graph backlog https://your-space.backlog.com/view/PROJ-123 --json
+```
+
+Legacy spaces live on `backlog.jp`; pass the host (`BACKLOG_SPACE=globetails.backlog.jp`) so requests go to the right domain. Add `--space` to require a particular space. The space in an issue URL and the `--space` value must both match the connected space. Each identity includes the space key and native issue ID, so issue keys from different spaces can't collide.
+
+## What the graph includes
+
+- Parent and sub-issues (`parentIssueId` and the issue list filtered by `parentIssueId[]`).
+- Related issues, which Backlog stores without a type, so they are undirected.
+- Issue keys written in descriptions and comments (`PROJ-123`, or a link to another issue in the same space). A token counts as a reference only when its prefix is a project key in this space, so `UTF-8` is ignored.
+- Links in descriptions and comments, listed without being fetched.
+- Native status, resolution, update time, and discussion signals (comments, participants, stars).
+
+## Project capture
+
+Pass a project key or numeric ID to capture its open issues:
+
+```bash
+issue-graph backlog --project PROJ --html backlog.html --open
+```
+
+Backlog has no "closed" flag on a status, so the project's last status in display order is treated as resolved and excluded. Add `--all` to include it. Open counts come from the count endpoint for the same set of statuses and are omitted when the project's statuses can't be read.
+
+## Dashboard
+
+`--html` writes an HTML explorer and, unless you pass `--no-save`, saves the latest run for the project:
+
+```bash
+issue-graph backlog PROJ-123 --html backlog.html --open
+issue-graph dashboard
+```
+
+`--cluster` prints a task for your agent to group open issues by root cause, and `--clusters PATH` applies the answer to `--html` or `--open`.
+
+Output is Markdown by default. `--json` prints the versioned report on stdout, including the coverage gaps the capture did not cover.
+
+## Limits
+
+Every list endpoint is capped at 100 records per request, so `--max-pages` bounds comments, sub-issues, and the project inventory. `--max-nodes` bounds detail reads, and the report lists known issues that were dropped. Attachment files and shared files are not downloaded: the API exposes their IDs, not public URLs, so only URLs written in text appear as links.

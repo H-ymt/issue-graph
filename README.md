@@ -13,7 +13,7 @@ Find related issues and pull requests before you start work. For humans and agen
   <img alt="issue-graph: open issues and pull requests from vercel-labs/portless grouped into five root-cause clusters, such as proxy port allocation and TLS trust" src="https://issue-graph.dev/readme-hero-light.png">
 </picture>
 
-issue-graph reads GitHub issues and pull requests, or Linear issues, and follows the references between them: closing links, mentions, cross-references, and Linear relations. It shows existing fixes, competing PRs, and open follow-ups as one graph, groups open work into clusters, and opens the result in a local dashboard. It only reads from GitHub and Linear.
+issue-graph reads GitHub issues and pull requests, Linear issues, or Nulab Backlog issues, and follows the references between them: closing links, mentions, cross-references, Linear relations, and Backlog parent/child and related issues. It shows existing fixes, competing PRs, and open follow-ups as one graph, groups open work into clusters, and opens the result in a local dashboard. It only reads from GitHub, Linear, and Backlog.
 
 ## Install
 
@@ -49,6 +49,15 @@ issue-graph linear ENG-123 --workspace your-workspace --open
 issue-graph linear --project <project-uuid> --open
 ```
 
+For Backlog, set the space and a read key, then capture an issue or a project:
+
+```bash
+export BACKLOG_SPACE=your-space              # or your-space.backlog.jp
+export BACKLOG_API_KEY=...
+issue-graph backlog PROJ-123 --open
+issue-graph backlog --project PROJ --open
+```
+
 The full walkthrough is in [Get started](https://issue-graph.dev/docs/get-started).
 
 ## How it works
@@ -81,7 +90,7 @@ Run `issue-graph --help` for the full list, or `issue-graph <command> --help` fo
 
 | Group | Commands | Docs |
 | --- | --- | --- |
-| Map work | `open`, `graph`, `linear` | [Graph](https://issue-graph.dev/docs/graph), [Linear](https://issue-graph.dev/docs/linear) |
+| Map work | `open`, `graph`, `linear`, `backlog` | [Graph](https://issue-graph.dev/docs/graph), [Linear](https://issue-graph.dev/docs/linear), [Nulab Backlog](https://issue-graph.dev/docs/nulab-backlog) |
 | Prioritize | `rank`, `cluster`, `reconcile`, `plan` | [Backlog](https://issue-graph.dev/docs/backlog), [Agents](https://issue-graph.dev/docs/agents) |
 | Dashboard | `dashboard`, `query`, `runs`, `config` | [Dashboard](https://issue-graph.dev/docs/dashboard) |
 | Pull requests | `status` | [Status](https://issue-graph.dev/docs/status) |
@@ -118,7 +127,7 @@ pnpm test:package
 
 ## Documentation
 
-- [issue-graph.dev](https://issue-graph.dev/docs): get started, commands, dashboard, and Linear
+- [issue-graph.dev](https://issue-graph.dev/docs): get started, commands, dashboard, Linear, and Nulab Backlog
 - [Changelog](https://issue-graph.dev/docs/changelog)
 
 ## License

@@ -2,7 +2,7 @@ import type { ReadCoverage, RelationshipEvidence, WorkLink } from "./dashboard-t
 
 export type { OpenItemCount, ReadCoverage, WorkLink } from "./dashboard-types.js";
 
-import type { CrawlEdge, CrawlNode } from "./types.js";
+import type { CrawlEdge, CrawlNode, HeatMeta } from "./types.js";
 
 export interface WorkProject {
   id: string;
@@ -36,4 +36,6 @@ export interface WorkNode extends CrawlNode {
   edges: WorkEdge[];
   externalLinks: WorkLink[];
   coverage: ReadCoverage[];
+  /** Discussion-heat signals, when the provider exposes them. */
+  heat?: HeatMeta;
 }

@@ -4,6 +4,7 @@ export const docsSlugs = [
   "graph",
   "dashboard",
   "linear",
+  "nulab-backlog",
   "status",
   "backlog",
   "agents",
